@@ -13,6 +13,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import shap
 
+
+import os
+import json
+
+# Criar kaggle.json a partir da variável de ambiente
+kaggle_token = os.getenv("KAGGLE_TOKEN_JSON")
+
+if kaggle_token:
+    os.makedirs("/root/.kaggle", exist_ok=True)
+    with open("/root/.kaggle/kaggle.json", "w") as f:
+        f.write(kaggle_token)
+
 # 1. Baixar dataset do Kaggle usando kagglehub
 dataset_path = kagglehub.dataset_download("johnsmith88/heart-disease-dataset")
 csv_path = os.path.join(dataset_path, "heart.csv")
