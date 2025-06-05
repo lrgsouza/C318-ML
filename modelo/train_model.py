@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from joblib import dump, load # Importar dump e load para salvar/carregar modelos
+import shap # Importar SHAP
 
 try:
     import kagglehub
@@ -32,10 +33,15 @@ TEST_SIZE = 0.2
 RANDOM_STATE = 42
 CV_FOLDS = 5 # Número de folds para validação cruzada
 
-# --- NEW: Model Saving Configuration ---
-OUTPUT_MODEL_DIR = 'modelo' # Alterado para 'modelo'
-MODEL_FILENAME = 'model_pipeline.pkl' # Alterado para 'model_pipeline.pkl'
+# --- Model Saving Configuration ---
+OUTPUT_MODEL_DIR = 'modelo'
+MODEL_FILENAME = 'model_pipeline.pkl'
+EXPLAINER_FILENAME = 'shap_explainer.pkl'
+FEATURE_ORDER_FILENAME = 'feature_order.pkl'
+
 FULL_MODEL_PATH = os.path.join(OUTPUT_MODEL_DIR, MODEL_FILENAME)
+FULL_EXPLAINER_PATH = os.path.join(OUTPUT_MODEL_DIR, EXPLAINER_FILENAME)
+FULL_FEATURE_ORDER_PATH = os.path.join(OUTPUT_MODEL_DIR, FEATURE_ORDER_FILENAME)
 
 
 # --- Kaggle Integration Configuration ---
@@ -128,6 +134,10 @@ categorical_features_updated = categorical_features + ['oldpeak_risk_group']
 # Prepare X and y for Modeling (incorporating engineered features)
 X = df_engineered.drop(TARGET_COLUMN, axis=1)
 y = df_engineered[TARGET_COLUMN]
+
+# Save original feature order before any transformations
+original_feature_order = X.columns.tolist()
+
 
 print("-" * 60)
 
@@ -282,23 +292,40 @@ else:
 print("-" * 60)
 
 
-# --- 12. Model Saving ---
-print("\nStep 12: Model Saving...")
+# --- 12. Model Saving and SHAP Artifacts ---
+print("\nStep 12: Model Saving and SHAP Artifacts...")
 
 if not os.path.exists(OUTPUT_MODEL_DIR):
     os.makedirs(OUTPUT_MODEL_DIR)
 
 if final_model_for_prediction:
     try:
-        # Saving the model using joblib.dump with the specified path and filename
+        # Saving the model pipeline
         dump(final_model_for_prediction, FULL_MODEL_PATH)
         print(f"Best model pipeline saved to {FULL_MODEL_PATH}")
         
-        # Optional: Load model for verification
+        # Load model for verification
         loaded_model = load(FULL_MODEL_PATH)
         print("Model loaded successfully for verification.")
+
+        # --- SHAP Explainer Generation and Saving ---
+        print("\nGenerating and saving SHAP explainer...")
+        # Transform X_train using the preprocessor from the final pipeline
+        X_train_transformed_for_shap = final_model_for_prediction.named_steps['preprocessor'].transform(X_train)
+        
+        # Create explainer based on the classifier in the pipeline
+        explainer = shap.Explainer(final_model_for_prediction.named_steps['classifier'], X_train_transformed_for_shap)
+        
+        # Save the explainer
+        dump(explainer, FULL_EXPLAINER_PATH)
+        print(f"SHAP Explainer saved to {FULL_EXPLAINER_PATH}")
+
+        # Save the original feature order
+        dump(original_feature_order, FULL_FEATURE_ORDER_PATH)
+        print(f"Feature order saved to {FULL_FEATURE_ORDER_PATH}")
+
     except Exception as e:
-        print(f"An error occurred while saving or loading the model: {e}")
+        print(f"An error occurred while saving model, explainer, or feature order: {e}")
 else:
     print("No best model was selected to save.")
 
