@@ -66,11 +66,16 @@ def explain_prediction(data: PatientData):
     df = preprocess_input(data)
     transformed = model.named_steps["preprocessor"].transform(df)
     shap_vals = explainer(transformed)
+
     shap_dict = {
         "base_value": float(np.ravel(shap_vals.base_values)[0]),
-        "shap_values": dict(zip(feature_order, map(float, shap_vals.values[0])))
+        "shap_values": {
+            feature: float(np.ravel(val)[0])
+            for feature, val in zip(feature_order, shap_vals.values[0])
+        }
     }
     return shap_dict
+
 
 # 7. Rota de saúde da API
 @app.get("/health")
