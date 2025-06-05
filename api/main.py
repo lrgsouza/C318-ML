@@ -1,5 +1,5 @@
 # /api/main.py
-
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
@@ -17,6 +17,14 @@ app = FastAPI(
     title="API de Previsão de Doença Cardíaca",
     description="Modelo treinado com SHAP e Random Forest",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://heart-disease-prediction-psi-ecru.vercel.app"],  # ou ["https://seufront.vercel.app"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # 3. Definir o schema de entrada com Pydantic
