@@ -9,7 +9,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Executa o treinamento (kagglehub vai usar a variável de ambiente)
-# RUN python modelo/train_model.py
+RUN python modelo/train_model.py
 
 EXPOSE 8080
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8080"]
