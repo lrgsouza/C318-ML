@@ -15,6 +15,7 @@ Este projeto é um exemplo completo de aplicação de Machine Learning com foco 
 │   └── main.py                  # API com FastAPI que serve o modelo
 ├── frontend/
 │   └── index.html               # Formulário que consome a API
+│   └── index_local.html         # Formulário que consome a API localmente
 ├── Dockerfile                   # Dockerfile unificado: treina + sobe API
 ├── requirements.txt             # Bibliotecas necessárias
 ```
