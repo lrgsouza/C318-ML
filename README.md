@@ -69,6 +69,13 @@ Acesse a documentação da API em: [http://localhost:8080/docs](http://localhost
 pip install -r requirements.txt
 ```
 
+## 🐍 Como rodar com python local
+
+```bash
+python modelo/train_model.py  # Treina o modelo e gera os arquivos .pkl
+uvicorn api.main:app --host 0.0.0.0 --port 8080
+```
+
 ---
 
 ## ☁️ Deploy na nuvem (resumo)
