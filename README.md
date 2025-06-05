@@ -57,7 +57,7 @@ Acesse a documentação da API em: [http://localhost:8080/docs](http://localhost
 ## 🌐 Como usar o frontend
 
 1. Vá até a pasta `frontend/`  
-2. Abra o arquivo `index.html` no navegador  
+2. Abra o arquivo `index_local.html` no navegador  
 3. Preencha os dados clínicos do paciente  
 4. Veja o resultado da predição e explicabilidade (SHAP)
 
