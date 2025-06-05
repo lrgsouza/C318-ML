@@ -56,9 +56,9 @@ pipeline.fit(X_train, y_train)
 print(classification_report(y_test, pipeline.predict(X_test)))
 
 # 7. SHAP
-X_transformed = preprocessor.fit_transform(X_train)
-explainer = shap.Explainer(pipeline.named_steps["classifier"], X_transformed)
-shap_values = explainer(X_transformed)
+X_train_transformed_for_shap = pipeline.steps[0][1].transform(X_train) # Acessa o pré-processador e o transforma os dados de treino
+explainer = shap.Explainer(pipeline.named_steps["classifier"], X_train_transformed_for_shap)
+shap_values = explainer(X_train_transformed_for_shap)
 
 # 8. Salvar artefatos
 os.makedirs("modelo", exist_ok=True)
