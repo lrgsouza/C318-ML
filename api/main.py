@@ -67,7 +67,7 @@ def explain_prediction(data: PatientData):
     transformed = model.named_steps["preprocessor"].transform(df)
     shap_vals = explainer(transformed)
     shap_dict = {
-        "base_value": float(shap_vals.base_values[0]),
+        "base_value": float(np.ravel(shap_vals.base_values)[0]),
         "shap_values": dict(zip(feature_order, map(float, shap_vals.values[0])))
     }
     return shap_dict
