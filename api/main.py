@@ -21,7 +21,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://heart-disease-prediction-psi-ecru.vercel.app"],  # ou ["https://seufront.vercel.app"]
+    allow_origins=["https://heart-disease-prediction-psi-ecru.vercel.app", "http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,8 +46,21 @@ class PatientData(BaseModel):
 # 4. Função auxiliar para converter entrada para DataFrame ordenado
 def preprocess_input(data: PatientData) -> pd.DataFrame:
     df = pd.DataFrame([data.dict()])
+
+    # Gerar as features derivadas
+    df['age_chol_interaction'] = df['age'] * df['chol']
+    df['oldpeak_risk_group'] = pd.cut(
+        df['oldpeak'],
+        bins=[-0.1, 1.0, 2.0, df['oldpeak'].max()],
+        labels=['Low', 'Medium', 'High'],
+        right=True,
+        include_lowest=True
+    )
+
+    # Reordenar para refletir exatamente a ordem esperada
     df = df[feature_order]
     return df
+
 
 # 5. Rota de predição
 @app.post("/predict")
