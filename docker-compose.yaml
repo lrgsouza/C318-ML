@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api_model:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_model
+    environment:
+      - KAGGLE_TOKEN_JSON=${KAGGLE_TOKEN_JSON}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  front_local:
+    image: nginx:alpine
+    container_name: front_local
+    volumes:
+      - ./frontend/index_local.html:/usr/share/nginx/html/index.html:ro
+    ports:
+      - "80:80"
+    restart: unless-stopped
