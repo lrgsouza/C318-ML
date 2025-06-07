@@ -31,36 +31,17 @@ git clone https://github.com/lrgsouza/C318-ML.git
 cd C318-ML
 ```
 
-### 2. Defina a variável de ambiente com seu token do Kaggle
-
-Obtenha seu token em https://www.kaggle.com/settings
+### 2. Rodando localmente com docker compose
 
 ```bash
-export KAGGLE_TOKEN_JSON='{"username":"seunome","key":"seutoken"}'
+docker-compose up --build
 ```
 
-### 3. Construa a imagem Docker
-
-```bash
-docker build -t modelo-api-unificada .
-```
-
-### 4. Rode a API localmente
-
-```bash
-docker run -p 8080:8080 -e KAGGLE_TOKEN_JSON="$KAGGLE_TOKEN_JSON" modelo-api-unificada
-```
-
+### 3. Acesse a API
 Acesse a documentação da API em: [http://localhost:8080/docs](http://localhost:8080/docs)
 
----
-
-## 🌐 Como usar o frontend
-
-1. Vá até a pasta `frontend/`  
-2. Abra o arquivo `index_local.html` no navegador  
-3. Preencha os dados clínicos do paciente  
-4. Veja o resultado da predição e explicabilidade (SHAP)
+### 4. Acesse o frontend
+Acesse o formulário em: [http://localhost:80](http://localhost:80)
 
 ---
 
@@ -83,13 +64,6 @@ uvicorn api.main:app --host 0.0.0.0 --port 8080
 
 - Google Cloud Run para a API
 - Vercel para o Frontend (consumindo API pública)
-
----
-
-## 🔒 Segurança
-
-- O token do Kaggle é **injetado como variável de ambiente** (sem persistir em disco)
-- O modelo e explicador SHAP são treinados no container e servidos imediatamente
 
 ---
 
