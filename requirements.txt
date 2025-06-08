@@ -6,3 +6,5 @@ shap
 kagglehub
 fastapi
 uvicorn[standard]
+matplotlib
+seaborn
