@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Previsão de Risco de Doença Cardíaca</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fafafa;
+      padding: 20px;
+    }
+    .result {
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    h1, h4 {
+      color: #343a40;
+    }
+    .chart-title {
+      margin-top: 40px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .chart-box {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar-placeholder"></div>
+
+<div class="container">
+  <h1 class="mb-2">Previsão de Risco de Doença Cardíaca</h1>
+  <h3 class="text-muted mb-4" id="paciente-nome">Paciente:</h3>
+  <div class="result" id="output">Carregando...</div>
+
+  <h4 class="chart-title">Probabilidade de Doença</h4>
+  <div id="probChart" class="chart-box"></div>
+
+  <h4 class="chart-title">Contribuição dos Fatores (SHAP)</h4>
+  <div id="shapChart" class="chart-box"></div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+<script>
+  fetch('navbar.html')
+    .then(res => res.text())
+    .then(html => document.getElementById('navbar-placeholder').innerHTML = html);
+
+  async function postWithFallback(endpoint, data) {
+    const urls = [
+      `https://c318-ml-1010639301046.europe-west1.run.app/${endpoint}`,
+      `http://localhost:8080/${endpoint}`
+    ];
+
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`Erro HTTP ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        console.warn(`Falha ao acessar ${url}: ${err.message}`);
+      }
+    }
+
+    throw new Error("Nenhuma URL de API funcionou.");
+  }
+
+  async function main() {
+    const params = new URLSearchParams(window.location.search);
+    const data = {};
+    for (const [key, value] of params.entries()) {
+      data[key] = isNaN(value) || key === "nome" ? value : parseFloat(value);
+    }
+
+    if (data.nome) {
+      document.getElementById("paciente-nome").innerText = `Paciente: ${data.nome}`;
+    }
+
+    const output = document.getElementById('output');
+    try {
+      const json = await postWithFallback("predict", data);
+      const explain = await postWithFallback("explain", data);
+
+      const base = explain.base_value;
+      const shapEntries = Object.entries(explain.shap_values);
+      const topContribs = shapEntries
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+        .slice(0, 10);
+
+      const traducao = {
+        age: "Idade",
+        sex: "Sexo",
+        cp: "Tipo de Dor no Peito",
+        trestbps: "Pressão em Repouso",
+        chol: "Colesterol",
+        fbs: "Glicose > 120",
+        restecg: "ECG em Repouso",
+        thalach: "Frequência Máxima",
+        exang: "Angina Induzida",
+        oldpeak: "Depressão ST",
+        slope: "Inclinação ST",
+        ca: "Nº de Vasos",
+        thal: "Talassemia",
+        age_chol_interaction: "Idade × Colesterol",
+        oldpeak_risk_group: "Grupo de Risco ST"
+      };
+
+      const features = topContribs.map(([f]) => traducao[f] || f).reverse();
+      const values = topContribs.map(([, v]) => v).reverse();
+      const pred = base + values.reduce((acc, v) => acc + v, 0);
+
+      output.innerHTML = `
+        <p class="mb-2">Com base nas informações fornecidas:</p>
+        <p><strong>Resultado:</strong> O modelo estima um 
+        <span class="font-weight-bold text-${json.risco_doenca == 1 ? 'danger' : 'success'}">
+        ${json.risco_doenca == 1 ? 'risco elevado' : 'risco reduzido'}</span> de doença cardíaca.</p>
+        <p><em>Probabilidade prevista: ${(json.probabilidade * 100).toFixed(1)}%</em></p>
+      `;
+
+      Plotly.newPlot('probChart', [{
+        type: 'bar',
+        x: [(json.probabilidade * 100)],
+        y: ['Paciente'],
+        orientation: 'h',
+        marker: {
+          color: json.risco_doenca == 1 ? '#dc3545' : '#28a745'
+        },
+        text: [`${(json.probabilidade * 100).toFixed(1)}%`],
+        textposition: 'auto'
+      }], {
+        xaxis: {
+          range: [0, 100],
+          title: 'Probabilidade de Doença (%)'
+        },
+        bargap: 0.2,
+        margin: { l: 80, r: 30, t: 20, b: 40 },
+        height: 120,
+        plot_bgcolor: '#fcfcfc',
+        paper_bgcolor: '#fcfcfc'
+      }, { displayModeBar: false, staticPlot: true });
+
+      Plotly.newPlot('shapChart', [{
+        type: 'bar',
+        orientation: 'h',
+        x: values,
+        y: features,
+        text: values.map(v => v.toFixed(2)),
+        textposition: 'auto',
+        marker: {
+          color: values.map(v => v > 0 ? 'rgba(0,123,255,0.7)' : 'rgba(220,53,69,0.7)')
+        }
+      }], {
+        title: `Contribuições SHAP — Base: ${base.toFixed(3)} | Predição: ${pred.toFixed(3)}`,
+        margin: { l: 150, r: 30, t: 50, b: 40 },
+        xaxis: { title: 'Contribuição para o Modelo' },
+        yaxis: { automargin: true },
+        height: 450,
+        plot_bgcolor: '#fcfcfc',
+        paper_bgcolor: '#fcfcfc'
+      }, { displayModeBar: false, staticPlot: true });
+
+    } catch (error) {
+      output.innerHTML = `<p class="text-danger">Erro ao consultar a API: ${error.message}</p>`;
+    }
+  }
+
+  main();
+</script>
+</body>
+</html>

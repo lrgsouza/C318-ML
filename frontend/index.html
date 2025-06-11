@@ -1,82 +1,259 @@
-<!-- /frontend/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Previsão de Doença Cardíaca</title>
+  <title>Cadastro do Paciente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { font-family: Arial; max-width: 800px; margin: auto; padding: 20px; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 5px; }
-    .result { background-color: #f0f0f0; margin-top: 20px; padding: 10px; border-radius: 5px; }
+    fieldset {
+      border: 1px solid #dee2e6;
+      border-radius: .5rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    legend {
+      font-size: 1.1rem;
+      font-weight: 600;
+      width: auto;
+      padding: 0 .5rem;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 25px;
+      margin-right: 10px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 25px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 19px;
+      width: 19px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #007bff;
+    }
+    input:checked + .slider:before {
+      transform: translateX(25px);
+    }
+    i.text-info {
+      cursor: pointer;
+      margin-left: 4px;
+    }
   </style>
 </head>
 <body>
-  <h1>Previsão de Doença Cardíaca</h1>
-  <form id="form">
-    <label>Idade: <input type="number" name="age" required /></label>
-    <label>Sexo (1 = homem, 0 = mulher): <input type="number" name="sex" min="0" max="1" required /></label>
-    <label>Tipo de dor no peito (0 a 3): <input type="number" name="cp" min="0" max="3" required /></label>
-    <label>Pressão em repouso (mm Hg): <input type="number" name="trestbps" required /></label>
-    <label>Colesterol (mg/dl): <input type="number" name="chol" required /></label>
-    <label>Glicose em jejum > 120 (1 = sim, 0 = não): <input type="number" name="fbs" min="0" max="1" required /></label>
-    <label>Eletrocardiograma (0 a 2): <input type="number" name="restecg" min="0" max="2" required /></label>
-    <label>Frequência cardíaca máxima: <input type="number" name="thalach" required /></label>
-    <label>Angina induzida (1 = sim, 0 = não): <input type="number" name="exang" min="0" max="1" required /></label>
-    <label>Oldpeak (ST): <input type="number" step="0.1" name="oldpeak" required /></label>
-    <label>Slope (0 a 2): <input type="number" name="slope" min="0" max="2" required /></label>
-    <label>Vasos principais (0 a 3): <input type="number" name="ca" min="0" max="3" required /></label>
-    <label>Talassemia (0 a 3): <input type="number" name="thal" min="0" max="3" required /></label>
-    <button type="submit">Enviar</button>
-  </form>
 
-  <div class="result" id="output"></div>
+<div id="navbar-container"></div>
 
-  <script>
-    const form = document.getElementById('form');
-    const output = document.getElementById('output');
+<div class="container mt-5">
+  <div class="mx-auto shadow-sm p-4 bg-white rounded" style="max-width: 720px;">
+    <h2 class="mb-4 text-center">Cadastro do Paciente</h2>
+    <form id="form" action="result.html" method="GET" novalidate>
 
-    form.addEventListener('submit', async (e) => {
+      <fieldset>
+        <legend>Informações Pessoais</legend>
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="nome">Nome completo</label>
+            <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: João da Silva" required>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="ageInput">Idade</label>
+            <input type="number" class="form-control" id="ageInput" name="age" required placeholder="anos" min="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sexo</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="sex" id="sex1" value="1" required>
+            <label class="form-check-label" for="sex1">Masculino</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="sex" id="sex0" value="0" required>
+            <label class="form-check-label" for="sex0">Feminino</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Parâmetros Clínicos</legend>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="cp">Tipo de dor no peito</label>
+            <select class="form-control" name="cp" id="cp" required>
+              <option value="">Selecione...</option>
+              <option value="0">0 - Angina típica</option>
+              <option value="1">1 - Angina atípica</option>
+              <option value="2">2 - Dor não anginosa</option>
+              <option value="3">3 - Assintomático</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="trestbps">Pressão em repouso</label>
+            <input type="number" class="form-control" name="trestbps" id="trestbps" required placeholder="mmHg">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="chol">Colesterol</label>
+            <input type="number" class="form-control" name="chol" id="chol" required placeholder="mg/dl">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="switch">
+            <input type="checkbox" name="fbs" id="fbsSwitch" value="1">
+            <span class="slider"></span>
+          </label>
+          <label>Glicose em jejum &gt; 120 mg/dl?</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Exames de Esforço e Coração</legend>
+        <div class="form-group">
+          <label for="restecg">Resultado do ECG</label>
+          <select class="form-control" name="restecg" id="restecg" required>
+            <option value="">Selecione...</option>
+            <option value="0">0 - Normal</option>
+            <option value="1">1 - Anormalidade ST-T</option>
+            <option value="2">2 - Hipertrofia ventricular</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="thalach">Frequência cardíaca máxima</label>
+          <input type="number" class="form-control" name="thalach" id="thalach" required placeholder="bpm">
+        </div>
+        <div class="form-group">
+          <label class="switch">
+            <input type="checkbox" name="exang" id="exangSwitch" value="1">
+            <span class="slider"></span>
+          </label>
+          <label>Angina induzida por esforço?</label>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="oldpeak">Oldpeak</label>
+            <input type="number" class="form-control" step="0.1" name="oldpeak" id="oldpeak" required placeholder="mm">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="slope">Inclinação ST</label>
+            <select class="form-control" name="slope" id="slope" required>
+              <option value="">Selecione...</option>
+              <option value="0">0 - Ascendente</option>
+              <option value="1">1 - Plano</option>
+              <option value="2">2 - Descendente</option>
+            </select>
+          </div>
+          <div class="form-group col-md-12">
+            <label>Nº de vasos principais</label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="ca" id="ca0" value="0" required>
+                <label class="form-check-label" for="ca0">0</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="ca" id="ca1" value="1">
+                <label class="form-check-label" for="ca1">1</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="ca" id="ca2" value="2">
+                <label class="form-check-label" for="ca2">2</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="ca" id="ca3" value="3">
+                <label class="form-check-label" for="ca3">3</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Resultados Complementares</legend>
+        <div class="form-group">
+          <label for="thal">Talassemia</label>
+          <select class="form-control" name="thal" id="thal" required>
+            <option value="">Selecione...</option>
+            <option value="0">0 - Normal</option>
+            <option value="1">1 - Defeito fixo</option>
+            <option value="2">2 - Defeito reversível</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary btn-block">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<div id="footer-container"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  fetch("navbar.html").then(res => res.text()).then(html => {
+    document.getElementById("navbar-container").innerHTML = html;
+  });
+  fetch("footer.html").then(res => res.text()).then(html => {
+    document.getElementById("footer-container").innerHTML = html;
+  });
+
+  // Validação personalizada
+  const form = document.getElementById("form");
+  form.addEventListener("submit", function (e) {
+    if (!form.checkValidity()) {
       e.preventDefault();
+      e.stopPropagation();
+    }
+    form.classList.add('was-validated');
 
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-      Object.keys(data).forEach(key => data[key] = parseFloat(data[key]));
-
-      output.innerHTML = "Enviando...";
-
-      const res = await fetch("https://c318-ml-1010639301046.europe-west1.run.app/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const json = await res.json();
-
-      const resExplain = await fetch("https://c318-ml-1010639301046.europe-west1.run.app/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const explain = await resExplain.json();
-
-      output.innerHTML = `
-        <h3>Resultado:</h3>
-        <p><strong>Risco de Doença:</strong> ${json.risco_doenca == 1 ? "Alto" : "Baixo"}</p>
-        <p><strong>Probabilidade:</strong> ${json.probabilidade * 100}%</p>
-        <h4>Explicabilidade (SHAP):</h4>
-        <p><strong>Valor base:</strong> ${explain.base_value.toFixed(3)}</p>
-        <p><strong>Features que mais influenciaram:</strong></p>
-        <ul>
-          ${Object.entries(explain.shap_values)
-            .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-            .slice(0, 5)
-            .map(([feature, val]) => `<li>${feature}: ${val.toFixed(3)}</li>`)
-            .join('')}
-        </ul>
-      `;
+    // Adicionar inputs escondidos para switches não marcados
+    ['fbsSwitch', 'exangSwitch'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.checked) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = el.name;
+        hidden.value = 0;
+        el.form.appendChild(hidden);
+      }
     });
-  </script>
+  });
+
+  // Mensagens de validação em português
+  document.querySelectorAll("input, select").forEach(input => {
+    input.addEventListener("invalid", function () {
+      input.setCustomValidity("Preencha este campo corretamente.");
+    });
+    input.addEventListener("input", function () {
+      input.setCustomValidity("");
+    });
+  });
+</script>
 </body>
 </html>
