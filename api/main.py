@@ -21,7 +21,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://heart-disease-prediction-psi-ecru.vercel.app", "http://localhost"],
+    allow_origins=["https://heart-disease-prediction-psi-ecru.vercel.app", "http://localhost", "http://127.0.0.1"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,15 +49,21 @@ def preprocess_input(data: PatientData) -> pd.DataFrame:
 
     # Gerar as features derivadas
     df['age_chol_interaction'] = df['age'] * df['chol']
+    max_oldpeak = max(2.1, df['oldpeak'].max())
     df['oldpeak_risk_group'] = pd.cut(
         df['oldpeak'],
-        bins=[-0.1, 1.0, 2.0, df['oldpeak'].max()],
+        bins=[-0.1, 1.0, 2.0, max_oldpeak],
         labels=['Low', 'Medium', 'High'],
         right=True,
         include_lowest=True
     )
 
-    # Reordenar para refletir exatamente a ordem esperada
+    # Garantir que todas as colunas do modelo estejam presentes
+    missing = set(feature_order) - set(df.columns)
+    if missing:
+        raise ValueError(f"Colunas ausentes no input: {missing}")
+
+    # Reordenar as colunas conforme esperado pelo modelo
     df = df[feature_order]
     return df
 
