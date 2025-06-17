@@ -1,5 +1,7 @@
 # 🖥 Frontend
 
+ - [Heart Disease Prediction](https://heart-disease-prediction-psi-ecru.vercel.app/)
+
 ## 🔸 Páginas
 
 - **index.html:** Formulário de cadastro  

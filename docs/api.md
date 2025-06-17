@@ -1,5 +1,7 @@
 # 🌐 Documentação da API
 
+- [API de Previsão de Doença Cardíaca](https://c318-ml-1010639301046.europe-west1.run.app/docs)
+
 ## 🔗 Endpoints
 
 ### `POST /predict`
