@@ -6,15 +6,8 @@ Este projeto é um exemplo completo de aplicação de Machine Learning com foco 
 
 ```
 C318-ML/
-├── modelo/
-│   ├── train_model.py        # Script de treinamento do modelo
-│   └── *.pkl                 # Arquivos do modelo e SHAP salvos
 ├── api/
 │   └── main.py               # API com FastAPI que serve o modelo
-├── frontend/
-│   ├── index.html            # Formulário que consome a API
-│   ├── index_local.html      # Formulário para uso local
-│   └── result.html           # Página de exibição dos resultados
 ├── docs/                     # Documentação detalhada
 │   ├── api.md                # Endpoints e uso da API
 │   ├── docker.md             # Configuração e uso do Docker
@@ -22,6 +15,13 @@ C318-ML/
 │   ├── installation.md       # Guias de instalação e execução
 │   ├── model.md              # Detalhes do modelo de ML
 │   └── tools.md              # Tecnologias e ferramentas utilizadas
+├── frontend/
+│   ├── index.html            # Formulário que consome a API
+│   ├── index_local.html      # Formulário para uso local
+│   └── result.html           # Página de exibição dos resultados
+├── modelo/
+│   ├── train_model.py        # Script de treinamento do modelo
+│   └── *.pkl                 # Arquivos do modelo e SHAP salvos
 ├── Dockerfile                # Dockerfile unificado: treina + sobe API
 ├── docker-compose.yaml       # Orquestração dos serviços
 ├── requirements.txt          # Dependências Python
@@ -30,12 +30,12 @@ C318-ML/
 
 ## 📚 Documentação Detalhada
 
-- **Documentação da API** (`docs/api.md`): Endpoints, exemplos de requisições e respostas.
-- **Configuração com Docker** (`docs/docker.md`): Serviços, portas e comandos essenciais.
-- **Especificações do Frontend** (`docs/frontend.md`): Funcionalidades, tecnologias e estrutura.
-- **Guia de Instalação** (`docs/installation.md`): Execução com e sem Docker.
-- **Detalhes do Modelo de ML** (`docs/model.md`): Pipeline, engenharia de features e métricas.
-- **Ferramentas e Tecnologias** (`docs/tools.md`): Frameworks, bibliotecas e dependências.
+- **[Documentação da API](docs/api.md)**: Endpoints, exemplos de requisições e respostas.
+- **[Configuração com Docker](docs/docker.md)**: Serviços, portas e comandos essenciais.
+- **[Especificações do Frontend](docs/frontend.md)**: Funcionalidades, tecnologias e estrutura.
+- **[Guia de Instalação](docs/installation.md)**: Execução com e sem Docker.
+- **[Detalhes do Modelo de ML](docs/model.md)**: Pipeline, engenharia de features e métricas.
+- **[Ferramentas e Tecnologias](docs/tools.md)**: Frameworks, bibliotecas e dependências.
 
 ## 🚀 Como Executar
 
