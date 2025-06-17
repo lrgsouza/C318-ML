@@ -1,9 +1,0 @@
-kagglehub[pandas-datasets]
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-summarytools
-google-cloud-bigquery
-google-auth
