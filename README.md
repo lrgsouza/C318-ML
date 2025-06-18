@@ -92,7 +92,7 @@ docker-compose up --build
 
 ## 📌 Créditos
 
-- **Dataset**: Heart Disease – Kaggle  
+- Dataset: [Heart Disease - Kaggle](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset)
 - **Explainability**: SHAP  
 - **Framework de API**: FastAPI  
 
